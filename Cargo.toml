@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-salah = "0.7.0"
 chrono = "0.4.23"
+islam = "0.2.0"
+time = {git = "https://github.com/time-rs/time", branch = "main"}

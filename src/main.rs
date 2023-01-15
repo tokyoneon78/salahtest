@@ -1,11 +1,17 @@
-use salah::prelude::*;
-use chrono::{ Utc, Date };
-
+pub use time::Date;
+use islam::pray::PrayerTimes;
+use islam::pray::PrayerSchedule;
+use islam::pray::Location;
+use islam::pray::Config;
+use islam::pray::Madhab;
+use islam::pray::Method;
+use chrono::{ Utc,  TimeZone, Local };
 pub struct PrayerParameters {
-    pub date: Date<Utc>,
-    pub location: Coordinates,
-    pub madhab_type: salah::Madhab,
-    pub time_calculation_method: salah::Method, 
+    pub date: Date,
+    pub timezone: i32,
+    pub location: Location,
+    pub madhab_type: Madhab,
+    pub time_calculation_method: Method, 
 
 }
 
@@ -13,8 +19,9 @@ pub struct PrayerParameters {
 impl Default for PrayerParameters{
     fn default() -> Self {
         Self{
-            date: Utc.ymd(2023, 01, 15),
-            location: Coordinates::new(9.1099, 7.4042), //Location of Gwarinpa
+            date: Local.ymd(2023, 01, 15),
+            timezone: 7,
+            location: Location::new(9.1099, 7.4042, Self::default().timezone), //Location of Gwarinpa
             madhab_type: Madhab::Shafi,
             time_calculation_method: Method::Egyptian,
         }
@@ -24,22 +31,53 @@ impl Default for PrayerParameters{
 
 fn all_prayer_time() {
 //let date  = Utc.ymd(2019, 1, 25);
-println!("{}", PrayerParameters::default().date);
-let params= Configuration::with(PrayerParameters::default().time_calculation_method, PrayerParameters::default().madhab_type);
-let prayers= PrayerSchedule::new()
-                      .on(PrayerParameters::default().date)
-                      .for_location(PrayerParameters::default().location)
-                      .with_configuration(params)
-                      .calculate();
-    println!("Hello, world!");
-    println!("{:?}", prayers.unwrap());
+        // https://www.mapcoordinates.net/en
+    let config = Config::new().with(PrayerParameters::default().time_calculation_method, PrayerParameters::default().madhab_type);
+    let prayer_times = PrayerSchedule::new(PrayerParameters::default().location)?
+        .on(PrayerParameters::default().date)
+        .with_config(config)
+        .calculate()?;
+
+    let fajr = prayer_times.fajr;
+    println!("fajr: {}:{}:{}", fajr.hour(), fajr.minute(), fajr.second());
+
+    let sherook = prayer_times.sherook;
+    println!(
+        "sherook: {}:{}:{}",
+        sherook.hour(),
+        sherook.minute(),
+        sherook.second()
+    );
+
+    let dohr = prayer_times.dohr;
+    println!("dohr: {}:{}:{}", dohr.hour(), dohr.minute(), dohr.second());
+
+    let asr = prayer_times.asr;
+    println!("asr: {}:{}:{}", asr.hour(), asr.minute(), asr.second());
+
+    let maghreb = prayer_times.maghreb;
+    println!(
+        "maghreb: {}:{}:{}",
+        maghreb.hour(),
+        maghreb.minute(),
+        maghreb.second()
+    );
+
+    let ishaa = prayer_times.ishaa;
+    println!(
+        "ishaa: {}:{}:{}",
+        ishaa.hour(),
+        ishaa.minute(),
+        ishaa.second()
+    );
 }
+
 
 fn next_pray_time() {
     
-    let params= Configuration::with(PrayerParameters::default().time_calculation_method, PrayerParameters::default().madhab_type);
+    let params= Config::with(PrayerParameters::default().time_calculation_method, PrayerParameters::default().madhab_type);
     let nextprayertime = PrayerTimes::new(PrayerParameters::default().date, PrayerParameters::default().location, params);
-    println!("{:?}", nextprayertime.time_remaining());
+    println!("{:?}", nextprayertime);
 }
 
 fn main() {
