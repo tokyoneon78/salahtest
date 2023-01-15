@@ -1,0 +1,2 @@
+- Current date provides error for invalid date hence Utc::now() fails with invalid time
+- Provided times are invalid for prayer.
