@@ -1,10 +1,13 @@
-pub use time::Date;
+use islam::time;
+use time::date::Date;
 use islam::pray::PrayerTimes;
 use islam::pray::PrayerSchedule;
 use islam::pray::Location;
 use islam::pray::Config;
 use islam::pray::Madhab;
 use islam::pray::Method;
+
+
 use chrono::{ Utc,  TimeZone, Local };
 pub struct PrayerParameters {
     pub date: Date,
@@ -19,7 +22,7 @@ pub struct PrayerParameters {
 impl Default for PrayerParameters{
     fn default() -> Self {
         Self{
-            date: Local.ymd(2023, 01, 15),
+            date: Date::from_calendar_date(2023, ::time::Month::January, 16).unwrap(),
             timezone: 7,
             location: Location::new(9.1099, 7.4042, Self::default().timezone), //Location of Gwarinpa
             madhab_type: Madhab::Shafi,
